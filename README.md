@@ -1,17 +1,30 @@
 
-````markdown
-# Kafka-based Azure Image Upload Service on Kubernetes
+---
 
-This repository contains the full setup for a Kafka-based image upload system using **Node.js** producer and consumer services deployed to **Kubernetes via Minikube**. Kafka is powered by the **Strimzi Operator**.
+# 📦 Kafka-Based Azure Image Upload with Minikube & Strimzi
+
+This repository contains the complete setup for a Kafka-based image upload service using **Node.js** producer and consumer microservices. The services are deployed on **Kubernetes** (via **Minikube**) and use **Apache Kafka** (via the **Strimzi Operator**) for communication. The consumer handles image uploads to Azure Blob Storage.
+
+---
+
+## 🚀 Features
+
+* Kafka Producer/Consumer built with Node.js
+* Kubernetes-native Kafka via Strimzi
+* Local setup using Minikube
+* Configurable via `.env` files
+* Dockerized services pushed to DockerHub
+* Azure Blob upload handling by consumer
 
 ---
 
 ## 🛠️ Prerequisites
 
-- Docker
-- Kubernetes CLI (`kubectl`)
-- Minikube
-- DockerHub account
+* [Docker](https://docs.docker.com/get-docker/)
+* [Kubectl](https://kubernetes.io/docs/tasks/tools/)
+* [Minikube](https://minikube.sigs.k8s.io/docs/start/)
+* DockerHub account
+* Azure Blob Storage credentials
 
 ---
 
@@ -22,7 +35,7 @@ This repository contains the full setup for a Kafka-based image upload system us
 ```bash
 curl -LO https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64
 sudo install minikube-linux-amd64 /usr/local/bin/minikube
-````
+```
 
 ### 2. Start Minikube
 
@@ -33,31 +46,27 @@ kubectl get nodes
 
 ---
 
-## 🧵 Kafka Setup with Strimzi
+## 📡 Set Up Kafka with Strimzi
 
-### 1️⃣ Install Strimzi (Kafka Operator)
+### 1️⃣ Install Strimzi Operator
 
 ```bash
 kubectl create namespace kafka
 kubectl apply -f https://strimzi.io/install/latest?namespace=kafka -n kafka
 ```
 
----
-
 ### 2️⃣ Deploy Kafka Cluster
 
-Create a file called `kafka-cluster.yaml` (already provided in this repo), then run:
+Create `kafka-cluster.yaml` (included in repo), then apply it:
 
 ```bash
 kubectl apply -f kafka-cluster.yaml -n kafka
 kubectl get pods -n kafka
 ```
 
----
-
 ### 3️⃣ Create Kafka Topic
 
-Create a file named `kafka-topic.yaml` (already provided in this repo), then run:
+Create `kafka-topic.yaml` (included in repo), then apply it:
 
 ```bash
 kubectl apply -f kafka-topic.yaml -n kafka
@@ -65,14 +74,14 @@ kubectl apply -f kafka-topic.yaml -n kafka
 
 ---
 
-## 📦 Environment Configurations
+## 🔐 Environment Configuration
 
-Make sure your `.env` file:
+Ensure your `.env` files:
 
-* Has no quotes around values
-* Has no trailing comments
+* Do **not** use quotes (`"`, `'`) around values
+* Have **no comments** on the same line
 
-### Apply ConfigMaps:
+### Apply as ConfigMaps:
 
 ```bash
 kubectl create configmap kafka-producer-config --from-env-file=.env -n kafka
@@ -81,11 +90,11 @@ kubectl create configmap kafka-consumer-config --from-env-file=.env -n kafka
 
 ---
 
-## 🏗️ Build & Push Docker Images
+## 🐳 Build & Push Docker Images
 
-Replace `my-dockerhub-username` with your actual DockerHub username.
+Replace `my-dockerhub-username` with your DockerHub username.
 
-### Producer:
+### Producer
 
 ```bash
 cd producer/
@@ -94,7 +103,7 @@ docker tag my-producer my-dockerhub-username/my-producer
 docker push my-dockerhub-username/my-producer
 ```
 
-### Consumer:
+### Consumer
 
 ```bash
 cd consumer/
@@ -105,26 +114,21 @@ docker push my-dockerhub-username/my-consumer
 
 ---
 
-## 🚀 Deploy to Kubernetes
+## 🚀 Deploy Producer & Consumer
 
-Apply the following YAMLs:
+Apply Kubernetes deployments:
 
 ```bash
 kubectl apply -f producer-deployment.yaml -n kafka
 kubectl apply -f consumer-deployment.yaml -n kafka
-```
-
-Verify pods:
-
-```bash
 kubectl get pods -n kafka
 ```
 
 ---
 
-## ✅ Test the Kafka Setup
+## 🧪 Test the Kafka Setup
 
-### View Logs:
+Check logs to verify message flow:
 
 ```bash
 kubectl logs deployment/kafka-producer -n kafka
@@ -133,9 +137,9 @@ kubectl logs deployment/kafka-consumer -n kafka
 
 ---
 
-## 🧹 Pod Management
+## 🔄 Pod Management
 
-### Restart a Pod:
+To delete or restart any pod:
 
 ```bash
 kubectl delete pod <POD_NAME> -n kafka
@@ -143,12 +147,34 @@ kubectl delete pod <POD_NAME> -n kafka
 
 ---
 
-## ⚙️ Modify Kafka Message Limits
+## 📈 Increase Kafka Message Limits
 
-Update the configurations in:
+You can increase message size limits by editing:
 
 * `kafka-cluster.yaml`
 * `kafka-topic.yaml`
+
+---
+
+## 🌐 Port Forwarding
+
+To expose your services running inside Kubernetes to your local machine:
+
+### Example: Forward Kafka Consumer App (port 3001)
+
+```bash
+kubectl port-forward deployment/kafka-consumer 3001:3001 -n kafka
+```
+
+### Example: Forward Kafka Producer App (port 3000)
+
+```bash
+kubectl port-forward deployment/kafka-producer 3000:3000 -n kafka
+```
+
+> You can then access them at `http://localhost:3000` and `http://localhost:3001`.
+
+For exposing Kafka brokers or UI dashboards (like Kafka UI, if added), similar forwarding applies. Ensure the app listens on `0.0.0.0` inside the container.
 
 ---
 
@@ -177,7 +203,6 @@ Update the configurations in:
 
 MIT License
 
-```
+---
 
-Let me know if you want me to add example `.env` or `.yaml` templates inside this README too.
-```
+Let me know if you'd like this README exported as a downloadable file or if you want to include Kafka UI tools in the setup.
