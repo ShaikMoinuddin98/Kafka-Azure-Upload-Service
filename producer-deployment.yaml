@@ -1,0 +1,24 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kafka-producer
+  namespace: kafka
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: kafka-producer
+  template:
+    metadata:
+      labels:
+        app: kafka-producer
+    spec:
+      containers:
+        - name: producer
+          image: my-dockerhub-username /my-producer
+          env:
+            - name: KAFKA_BROKER
+              value: "my-cluster-kafka-bootstrap.kafka:9092"
+         envFrom:
+            - configMapRef:
+               name: kafka-producer-config

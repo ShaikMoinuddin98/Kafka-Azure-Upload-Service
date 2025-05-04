@@ -1,0 +1,24 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kafka-consumer
+  namespace: kafka
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: kafka-consumer
+  template:
+    metadata:
+      labels:
+        app: kafka-consumer
+    spec:
+      containers:
+        - name: consumer
+          image: my-dockerhub-username/my-consumer
+          env:
+            - name: KAFKA_BROKER
+              value: "my-cluster-kafka-bootstrap.kafka:9092"
+             envFrom:
+            - configMapRef:
+               name: kafka-consumer-config
