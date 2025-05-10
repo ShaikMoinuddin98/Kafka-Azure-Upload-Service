@@ -204,5 +204,3 @@ For exposing Kafka brokers or UI dashboards (like Kafka UI, if added), similar f
 MIT License
 
 ---
-
-Let me know if you'd like this README exported as a downloadable file or if you want to include Kafka UI tools in the setup.
